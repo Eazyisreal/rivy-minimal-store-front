@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '5000:5000'
+    environment:
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_DATABASE=${DATABASE_DATABASE}
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - storefront-network
+
+networks:
+  storefront-network:
+    driver: bridge
