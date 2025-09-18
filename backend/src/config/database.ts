@@ -1,28 +1,30 @@
-import { Client } from "pg";
+import { Sequelize } from "sequelize";
 import fs from "fs";
 
-const config = {
-  user: process.env.DATABASE_USER,
-  password: process.env.DATABASE_PASSWORD,
-  host: process.env.DATABASE_HOST,  
-  port: Number(process.env.DATABASE_PORT),
-  database: process.env.DATABASE_DATABASE,
-  ssl: {
-    rejectUnauthorized: true,
-    ca: fs.readFileSync("./ca.pem").toString(),
-  },
-};
-
-export const client = new Client(config);
+export const sequelize = new Sequelize(
+  process.env.DATABASE_DATABASE!,
+  process.env.DATABASE_USER!,
+  process.env.DATABASE_PASSWORD!,
+  {
+    host: process.env.DATABASE_HOST!,
+    port: Number(process.env.DATABASE_PORT),
+    dialect: "postgres",
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: true,
+        ca: fs.readFileSync("./ca.pem").toString(),
+      },
+    },
+    logging: false,
+  }
+);
 
 export async function testDbConnection() {
   try {
-    await client.connect();
-    const result = await client.query("SELECT VERSION()");
-    console.log("✅ DB Connected:", result.rows[0]);
-  } catch (err) {
-    console.error("❌ DB Connection Error:", err);
-  } finally {
-    await client.end();
+    await sequelize.authenticate();
+    console.log("✅ DB Connected successfully");
+  } catch (error) {
+    console.error("❌ DB Connection Error:", error);
   }
 }
