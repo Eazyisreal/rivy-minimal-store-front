@@ -280,5 +280,6 @@ npm run type-check   # Run TypeScript type checking
 - **Frontend**: [https://rivy-minimal-store-front.vercel.app/](https://rivy-minimal-store-front.vercel.app/)
 - **Backend API**: [https://rivy-minimal-store-front.onrender.com/](https://rivy-minimal-store-front.onrender.com/)
 - **API Documentation**: [https://rivy-minimal-store-front.onrender.com/](https://rivy-minimal-store-front.onrender.com/)
+- **Technical Audit Documentation**: [Technical Audit Documentation](https://docs.google.com/document/d/1KM9VACjAzDDi6082Ci-oYzCpa-1DB-rvAHa5s32KAXc/edit?tab=t.0)
 
 
