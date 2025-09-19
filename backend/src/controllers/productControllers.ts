@@ -12,27 +12,27 @@ import { z } from "zod";
  *     Product:
  *       type: object
  *       properties:
- *         id: 
+ *         id:
  *           type: string
  *           format: uuid
- *         name: 
+ *         name:
  *           type: string
- *         description: 
+ *         description:
  *           type: string
- *         price: 
+ *         price:
  *           type: number
- *         stock: 
+ *         stock:
  *           type: integer
- *         categoryId: 
+ *         categoryId:
  *           type: string
  *           format: uuid
  *         subCategoryId:
  *           type: string
  *           format: uuid
- *         brandId: 
+ *         brandId:
  *           type: string
  *           format: uuid
- *         imageUrl: 
+ *         imageUrl:
  *           type: string
  */
 
@@ -57,48 +57,48 @@ const productQuerySchema = z.object({
  *         name: page
  *         schema:
  *           type: integer
- *         description: Page number for pagination (default: 1)
+ *         description: "Page number for pagination (default: 1)"
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
- *         description: Number of products per page (default: 10, max: 100)
+ *         description: "Number of products per page (default: 10, max: 100)"
  *       - in: query
  *         name: search
  *         schema:
  *           type: string
- *         description: Search keyword for product names
+ *         description: "Search keyword for product names"
  *       - in: query
  *         name: categoryId
  *         schema:
  *           type: string
  *           format: uuid
- *         description: Filter products by category
+ *         description: "Filter products by category ID"
  *       - in: query
  *         name: subCategoryId
  *         schema:
  *           type: string
  *           format: uuid
- *         description: Filter products by subcategory
+ *         description: "Filter products by subcategory ID"
  *       - in: query
  *         name: brandId
  *         schema:
  *           type: string
  *           format: uuid
- *         description: Filter products by brand
+ *         description: "Filter products by brand ID"
  *       - in: query
  *         name: minPrice
  *         schema:
  *           type: number
- *         description: Minimum product price
+ *         description: "Minimum product price"
  *       - in: query
  *         name: maxPrice
  *         schema:
  *           type: number
- *         description: Maximum product price
+ *         description: "Maximum product price"
  *     responses:
  *       200:
- *         description: List of products
+ *         description: "List of products"
  *         content:
  *           application/json:
  *             schema:
@@ -115,7 +115,7 @@ const productQuerySchema = z.object({
  *                   items:
  *                     $ref: '#/components/schemas/Product'
  *       400:
- *         description: Invalid query parameters
+ *         description: "Invalid query parameters"
  */
 export const getProducts = async (req: Request, res: Response) => {
   try {
@@ -147,13 +147,14 @@ export const getProducts = async (req: Request, res: Response) => {
  *     parameters:
  *       - in: path
  *         name: id
- *         schema: 
+ *         schema:
  *           type: string
  *           format: uuid
  *         required: true
+ *         description: "The unique ID of the product"
  *     responses:
  *       200:
- *         description: Product details
+ *         description: "Product details"
  *         content:
  *           application/json:
  *             schema:
@@ -168,11 +169,11 @@ export const getProducts = async (req: Request, res: Response) => {
  *                 data:
  *                   $ref: '#/components/schemas/Product'
  *       404:
- *         description: Product not found
+ *         description: "Product not found"
  */
 export const getProductById = async (req: Request, res: Response) => {
   try {
-    const id = z.string().uuid().parse(req.params.id); 
+    const id = z.string().uuid().parse(req.params.id);
     const product = await Product.findByPk(id);
 
     if (!product) {
