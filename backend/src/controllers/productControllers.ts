@@ -25,16 +25,24 @@ import { z } from "zod";
  *           type: integer
  *         categoryId: 
  *           type: string
+ *           format: uuid
+ *         subCategoryId:
+ *           type: string
+ *           format: uuid
  *         brandId: 
  *           type: string
+ *           format: uuid
  *         imageUrl: 
  *           type: string
  */
 
 const productQuerySchema = z.object({
   page: z.coerce.number().min(1).default(1),
+  limit: z.coerce.number().min(1).max(100).default(10),
   search: z.string().optional(),
-  category: z.string().optional(),
+  categoryId: z.string().uuid().optional(),
+  subCategoryId: z.string().uuid().optional(),
+  brandId: z.string().uuid().optional(),
   minPrice: z.coerce.number().min(0).default(0),
   maxPrice: z.coerce.number().min(0).default(100000),
 });
@@ -47,19 +55,47 @@ const productQuerySchema = z.object({
  *     parameters:
  *       - in: query
  *         name: page
- *         schema: { type: integer }
+ *         schema:
+ *           type: integer
+ *         description: Page number for pagination (default: 1)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Number of products per page (default: 10, max: 100)
  *       - in: query
  *         name: search
- *         schema: { type: string }
+ *         schema:
+ *           type: string
+ *         description: Search keyword for product names
  *       - in: query
- *         name: category
- *         schema: { type: string }
+ *         name: categoryId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Filter products by category
+ *       - in: query
+ *         name: subCategoryId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Filter products by subcategory
+ *       - in: query
+ *         name: brandId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Filter products by brand
  *       - in: query
  *         name: minPrice
- *         schema: { type: number }
+ *         schema:
+ *           type: number
+ *         description: Minimum product price
  *       - in: query
  *         name: maxPrice
- *         schema: { type: number }
+ *         schema:
+ *           type: number
+ *         description: Maximum product price
  *     responses:
  *       200:
  *         description: List of products
@@ -68,27 +104,32 @@ const productQuerySchema = z.object({
  *             schema:
  *               type: object
  *               properties:
- *                 success: { type: boolean }
- *                 statusCode: { type: integer }
- *                 message: { type: string }
- *                 data: 
+ *                 success:
+ *                   type: boolean
+ *                 statusCode:
+ *                   type: integer
+ *                 message:
+ *                   type: string
+ *                 data:
  *                   type: array
- *                   items: 
+ *                   items:
  *                     $ref: '#/components/schemas/Product'
  *       400:
  *         description: Invalid query parameters
  */
 export const getProducts = async (req: Request, res: Response) => {
   try {
-    const { page, search, category, minPrice, maxPrice } =
+    const { page, limit, search, categoryId, subCategoryId, brandId, minPrice, maxPrice } =
       productQuerySchema.parse(req.query);
 
-    const limit = 10;
     const offset = (page - 1) * limit;
 
     const where: any = { price: { [Op.between]: [minPrice, maxPrice] } };
+
     if (search) where.name = { [Op.iLike]: `%${search}%` };
-    if (category) where.categoryId = category;
+    if (categoryId) where.categoryId = categoryId;
+    if (subCategoryId) where.subCategoryId = subCategoryId;
+    if (brandId) where.brandId = brandId;
 
     const products = await Product.findAll({ where, limit, offset });
 
@@ -116,11 +157,16 @@ export const getProducts = async (req: Request, res: Response) => {
  *         content:
  *           application/json:
  *             schema:
- *               success: { type: boolean }
- *               statusCode: { type: integer }
- *               message: { type: string }
- *               data: 
- *                 $ref: '#/components/schemas/Product'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 statusCode:
+ *                   type: integer
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Product'
  *       404:
  *         description: Product not found
  */
