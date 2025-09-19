@@ -10,7 +10,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: "http://rivy-minimal-store-front.onrender.com/api/v1",
+        url: "https://rivy-minimal-store-front.onrender.com/api/v1",
       },
     ],
   },
