@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import { Op } from "sequelize";
 import Product from "../models/product";
+import { sendResponse } from "../middleware/requestHandler";
 import { z } from "zod";
 
 /**
@@ -67,6 +68,9 @@ const productQuerySchema = z.object({
  *             schema:
  *               type: object
  *               properties:
+ *                 success: { type: boolean }
+ *                 statusCode: { type: integer }
+ *                 message: { type: string }
  *                 data: 
  *                   type: array
  *                   items: 
@@ -87,9 +91,10 @@ export const getProducts = async (req: Request, res: Response) => {
     if (category) where.categoryId = category;
 
     const products = await Product.findAll({ where, limit, offset });
-    res.json({ data: products });
+
+    return sendResponse(res, 200, products, "Products fetched successfully");
   } catch (err) {
-    res.status(400).json({ error: "Invalid query parameters" });
+    return sendResponse(res, 400, null, "Invalid query parameters");
   }
 };
 
@@ -111,7 +116,11 @@ export const getProducts = async (req: Request, res: Response) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Product'
+ *               success: { type: boolean }
+ *               statusCode: { type: integer }
+ *               message: { type: string }
+ *               data: 
+ *                 $ref: '#/components/schemas/Product'
  *       404:
  *         description: Product not found
  */
@@ -119,11 +128,13 @@ export const getProductById = async (req: Request, res: Response) => {
   try {
     const id = z.string().uuid().parse(req.params.id); 
     const product = await Product.findByPk(id);
+
     if (!product) {
-      return res.status(404).json({ error: "Product not found" });
+      return sendResponse(res, 404, null, "Product not found");
     }
-    res.json(product);
+
+    return sendResponse(res, 200, product, "Product fetched successfully");
   } catch (err) {
-    res.status(400).json({ error: "Invalid product ID" });
+    return sendResponse(res, 400, null, "Invalid product ID");
   }
 };

@@ -40,4 +40,14 @@ Category.init(
   }
 );
 
+Category.hasMany(Category, {
+  foreignKey: 'parentId',
+  as: 'subCategories',
+});
+
+Category.belongsTo(Category, {
+  foreignKey: 'parentId',
+  as: 'parentCategory',
+});
+
 export default Category;

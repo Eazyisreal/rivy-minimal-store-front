@@ -1,5 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
 
+import Order from './order';
+import Product from './product';
 import {sequelize} from '../config/database';
 
 class OrderItem extends Model {
@@ -7,7 +9,7 @@ class OrderItem extends Model {
   public orderId!: string;
   public productId!: string;
   public quantity!: number;
-  public unitPrice!: number;
+  public price!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -39,7 +41,6 @@ OrderItem.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       validate: {
-        isInt: true,
         min: 1,
       },
     },
@@ -58,5 +59,26 @@ OrderItem.init(
     timestamps: true,
   }
 );
+
+
+Order.hasMany(OrderItem, { 
+  foreignKey: 'orderId',
+  as: 'orderItems'
+});
+
+OrderItem.belongsTo(Order, { 
+  foreignKey: 'orderId',
+  as: 'order'
+});
+
+Product.hasMany(OrderItem, { 
+  foreignKey: 'productId',
+  as: 'orderItems'
+});
+
+OrderItem.belongsTo(Product, { 
+  foreignKey: 'productId',
+  as: 'product'
+});
 
 export default OrderItem;

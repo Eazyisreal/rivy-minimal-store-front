@@ -9,6 +9,10 @@ class Order extends Model {
   public userId!: string | null;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+    orderNumber: any;
+    subtotal: any;
+    tax: any;
+    shipping: any;
 }
 
 Order.init(
@@ -42,5 +46,7 @@ Order.init(
     timestamps: true,
   }
 );
+
+
 
 export default Order;
