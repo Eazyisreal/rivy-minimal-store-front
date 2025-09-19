@@ -40,9 +40,21 @@ const productQuerySchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(10),
   search: z.string().optional(),
-  categoryId: z.string().uuid().optional(),
-  subCategoryId: z.string().uuid().optional(),
-  brandId: z.string().uuid().optional(),
+  categoryId: z
+    .string()
+    .uuid()
+    .optional()
+    .transform((val) => val || undefined),
+  subCategoryId: z
+    .string()
+    .uuid()
+    .optional()
+    .transform((val) => val || undefined),
+  brandId: z
+    .string()
+    .uuid()
+    .optional()
+    .transform((val) => val || undefined),
   minPrice: z.coerce.number().min(0).default(0),
   maxPrice: z.coerce.number().min(0).default(100000),
 });
@@ -119,8 +131,22 @@ const productQuerySchema = z.object({
  */
 export const getProducts = async (req: Request, res: Response) => {
   try {
-    const { page, limit, search, categoryId, subCategoryId, brandId, minPrice, maxPrice } =
-      productQuerySchema.parse(req.query);
+    const query = Object.fromEntries(
+      Object.entries(req.query).map(([key, value]) => [
+        key,
+        value === "" ? undefined : value,
+      ])
+    );
+    const {
+      page,
+      limit,
+      search,
+      categoryId,
+      subCategoryId,
+      brandId,
+      minPrice,
+      maxPrice,
+    } = productQuerySchema.parse(query);
 
     const offset = (page - 1) * limit;
 
