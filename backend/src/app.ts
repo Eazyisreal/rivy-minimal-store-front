@@ -3,6 +3,7 @@ import brandRoutes from "./routes/brandRoutes";
 import categoryRoutes from "./routes/catergoriesRoutes";
 import checkoutRoutes from "./routes/checkoutRoutes";
 import cors from "cors";
+import dotenv from "dotenv";
 import { errorHandler } from "./middleware/errorHandler";
 import express from "express";
 import orderItemsRoutes from "./routes/orderItemsRoutes";
@@ -12,9 +13,34 @@ import { requestLogger } from "./middleware/requestLogger";
 import swaggerDocs from "./config/swagger";
 import swaggerUi from "swagger-ui-express";
 
+dotenv.config();
+
 const app = express();
-app.set('trust proxy', 1);
-app.use(cors());
+app.set("trust proxy", 1);
+
+const allowedOrigins =
+  process.env.CORS_ORIGINS?.split(",").map(o => o.trim()) || [];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+
+      if (
+        process.env.NODE_ENV === "development" ||
+        allowedOrigins.includes(origin)
+      ) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 app.use(requestLogger);
 app.use(apiLimiter);
