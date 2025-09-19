@@ -76,7 +76,6 @@ export default function OrderDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Header */}
         <div className="mb-6">
           <Link to="/orders" className="text-blue-600 hover:text-blue-800 flex items-center gap-2 mb-4">
             <ArrowLeft className="w-4 h-4" />
@@ -96,16 +95,14 @@ export default function OrderDetailPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Order Items */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Order Progress */}
             {order.status !== "cancelled" && (
               <Card>
                 <CardContent className="p-6">
                   <h2 className="text-xl font-semibold mb-6">Order Progress</h2>
                   <div className="relative">
                     <div className="absolute top-5 left-4 w-0.5 h-32 bg-gray-200"></div>
-                    {orderSteps.map((step, index) => {
+                    {orderSteps.map((step) => {
                       const status = getStepStatus(step.key);
                       const Icon = step.icon;
                       
@@ -133,7 +130,6 @@ export default function OrderDetailPage() {
               </Card>
             )}
 
-            {/* Order Items */}
             <Card>
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4">Order Items</h2>
@@ -172,7 +168,6 @@ export default function OrderDetailPage() {
             </Card>
           </div>
 
-          {/* Order Summary */}
           <div className="lg:col-span-1">
             <Card className="sticky top-8">
               <CardContent className="p-6">

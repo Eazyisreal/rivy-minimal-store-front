@@ -2,6 +2,7 @@ import api from "./axios";
 import { useQuery } from "@tanstack/react-query";
 
 export interface OrderItem {
+  name: any;
   id: string;
   orderId: string;
   productId: string;

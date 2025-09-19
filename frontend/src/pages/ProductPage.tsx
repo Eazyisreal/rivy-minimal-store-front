@@ -11,14 +11,50 @@ import { useCategories } from "../api/categories";
 import { useProducts } from "../api/product";
 import { useState } from "react";
 
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  stock: number;
+  imageUrl?: string;
+  image?: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  subCategories?: SubCategory[];
+}
+
+interface SubCategory {
+  id: string;
+  name: string;
+}
+
+interface Brand {
+  id: string;
+  name: string;
+}
+
+interface ProductFilters {
+  search: string;
+  categoryId: string;
+  subCategoryId: string;
+  brandId: string;
+  min: number | undefined;
+  max: number | undefined;
+  page: number;
+  limit: number;
+}
+
 export default function CatalogPage() {
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<ProductFilters>({
     search: "",
     categoryId: "",
     subCategoryId: "",
     brandId: "",
-    min: undefined as number | undefined,
-    max: undefined as number | undefined,
+    min: undefined,
+    max: undefined,
     page: 1,
     limit: 12,
   });
@@ -28,10 +64,10 @@ export default function CatalogPage() {
   const { data: brands } = useBrands();
   const { addItem } = useCart();
 
-  const selectedCategory = categories?.find((c) => c.id === filters.categoryId);
+  const selectedCategory = categories?.find((c: Category) => c.id === filters.categoryId);
   const subCategories = selectedCategory?.subCategories || [];
 
-  const handleAddToCart = (product: any) => {
+  const handleAddToCart = (product: Product) => {
     addItem({
       id: product.id,
       name: product.name,
@@ -101,14 +137,14 @@ export default function CatalogPage() {
                     }
                   >
                     <option value="">All Categories</option>
-                    {categories?.map((c) => (
+                    {categories?.map((c: Category) => (
                       <option key={c.id} value={c.id}>
                         {c.name}
                       </option>
                     ))}
                   </select>
 
-                  {subCategories?.length > 0 && (
+                  {subCategories.length > 0 && (
                     <select
                       className="w-full border rounded-lg p-2 mt-2 bg-white"
                       value={filters.subCategoryId}
@@ -117,7 +153,7 @@ export default function CatalogPage() {
                       }
                     >
                       <option value="">All Subcategories</option>
-                      {subCategories.map((sc) => (
+                      {subCategories.map((sc: SubCategory) => (
                         <option key={sc.id} value={sc.id}>
                           {sc.name}
                         </option>
@@ -136,7 +172,7 @@ export default function CatalogPage() {
                     }
                   >
                     <option value="">All Brands</option>
-                    {brands?.map((b) => (
+                    {brands?.map((b: Brand) => (
                       <option key={b.id} value={b.id}>
                         {b.name}
                       </option>
@@ -173,7 +209,6 @@ export default function CatalogPage() {
             </Card>
           </aside>
 
-          {/* Products Grid */}
           <section className="lg:col-span-3">
             <div className="mb-6">
               <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Product Catalog</h1>
@@ -190,7 +225,7 @@ export default function CatalogPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
-                {products.map((product) => (
+                {products.map((product: Product) => (
                   <Card
                     key={product.id}
                     className="overflow-hidden hover:shadow-lg transition-all duration-300 bg-white group"
@@ -214,7 +249,7 @@ export default function CatalogPage() {
                           {product.name}
                         </h3>
                         <p className="text-lg font-bold text-green-600 mb-4">
-                          ${product.price}
+                          ${typeof product.price === 'number' ? product.price.toFixed(2) : product.price}
                         </p>
                         
                         <div className="mt-auto space-y-2">

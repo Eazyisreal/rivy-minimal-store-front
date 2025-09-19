@@ -79,13 +79,10 @@ export default function OrdersPage() {
 
         <div className="space-y-4 lg:space-y-6">
           {orders.map((order) => {
-            const items = order.items || [];
             return (
               <Card key={order.id} className="overflow-hidden hover:shadow-md transition-shadow">
                 <CardContent className="p-4 lg:p-6">
-                  {/* Mobile and Desktop Layout */}
                   <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                    {/* Order Info */}
                     <div className="flex items-start gap-3 lg:gap-4 flex-1">
                       <div className="p-2 bg-blue-50 rounded-lg flex-shrink-0">
                         <Package className="w-4 h-4 lg:w-5 lg:h-5 text-blue-600" />
@@ -109,7 +106,6 @@ export default function OrdersPage() {
                       </div>
                     </div>
 
-                    {/* Status and Actions */}
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 lg:gap-3 lg:flex-shrink-0">
                       <span
                         className={`px-2 lg:px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
@@ -131,27 +127,7 @@ export default function OrdersPage() {
                     </div>
                   </div>
 
-                  {/* Order Items Preview */}
-                  <div className="border-t mt-4 pt-4">
-                    <div className="flex flex-wrap gap-2 lg:gap-4">
-                      {items.slice(0, 3).map((item, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center gap-1 lg:gap-2 text-xs lg:text-sm text-gray-600 bg-gray-50 px-2 py-1 rounded"
-                        >
-                          <span className="font-medium">{item.quantity}x</span>
-                          <span className="truncate max-w-[120px] lg:max-w-none">
-                            {item.product?.name || `Product ${item.productId}`}
-                          </span>
-                        </div>
-                      ))}
-                      {items.length > 3 && (
-                        <span className="text-xs lg:text-sm text-gray-500 flex items-center px-2 py-1">
-                          +{items.length - 3} more item{items.length - 3 > 1 ? "s" : ""}
-                        </span>
-                      )}
-                    </div>
-                  </div>
+
                 </CardContent>
               </Card>
             );
