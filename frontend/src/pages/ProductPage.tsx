@@ -4,10 +4,12 @@ import { Eye, ShoppingCart } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Link } from "react-router-dom";
+import Loader from "../components/Loader";
 import toast from "react-hot-toast";
 import { useBrands } from "../api/brand";
 import { useCart } from "../context/cartcontext";
 import { useCategories } from "../api/categories";
+import { useDebounce } from "../hooks/useDebounce";
 import { useProducts } from "../api/product";
 import { useState } from "react";
 
@@ -41,8 +43,8 @@ interface ProductFilters {
   categoryId: string;
   subCategoryId: string;
   brandId: string;
-  min: number | undefined;
-  max: number | undefined;
+  min: number;
+  max: number ;
   page: number;
   limit: number;
 }
@@ -53,13 +55,20 @@ export default function CatalogPage() {
     categoryId: "",
     subCategoryId: "",
     brandId: "",
-    min: undefined,
-    max: undefined,
+    min: 100,
+    max: 100000,
     page: 1,
-    limit: 12,
+    limit: 100,
   });
 
-  const { data: products, isLoading, isError } = useProducts(filters);
+  const debouncedSearch = useDebounce(filters.search, 500);
+
+  const debouncedFilters = {
+    ...filters,
+    search: debouncedSearch,
+  }
+
+  const { data: products, isLoading, isError } = useProducts(debouncedFilters);
   const { data: categories } = useCategories();
   const { data: brands } = useBrands();
   const { addItem } = useCart();
@@ -79,16 +88,7 @@ export default function CatalogPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center py-16">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading products...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (isError) {
@@ -110,7 +110,6 @@ export default function CatalogPage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
-          {/* Filters Sidebar */}
           <aside className="lg:col-span-1">
             <Card className="sticky top-6">
               <CardContent className="p-4 lg:p-6 space-y-6">
@@ -186,20 +185,22 @@ export default function CatalogPage() {
                     <Input
                       type="number"
                       placeholder="Min"
+                      value={filters.min}
                       onChange={(e) =>
                         setFilters({
                           ...filters,
-                          min: Number(e.target.value) || undefined,
+                          min: Number(e.target.value) || 0,
                         })
                       }
                     />
                     <Input
                       type="number"
                       placeholder="Max"
+                      value={filters.max}
                       onChange={(e) =>
                         setFilters({
                           ...filters,
-                          max: Number(e.target.value) || undefined,
+                          max: Number(e.target.value) || 0,
                         })
                       }
                     />
@@ -243,7 +244,7 @@ export default function CatalogPage() {
                         )}
                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
                       </div>
-                      
+
                       <div className="p-4 flex flex-col flex-grow">
                         <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2">
                           {product.name}
@@ -251,7 +252,7 @@ export default function CatalogPage() {
                         <p className="text-lg font-bold text-green-600 mb-4">
                           ${typeof product.price === 'number' ? product.price.toFixed(2) : product.price}
                         </p>
-                        
+
                         <div className="mt-auto space-y-2">
                           <div className="flex items-center gap-2">
                             <div className={`w-2 h-2 rounded-full ${product.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`}></div>
@@ -259,11 +260,11 @@ export default function CatalogPage() {
                               {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
                             </span>
                           </div>
-                          
+
                           <div className="flex gap-2">
                             <Link to={`/product/${product.id}`} className="flex-1">
-                              <Button 
-                                variant="outline" 
+                              <Button
+                                variant="outline"
                                 className="w-full flex items-center gap-1 text-xs"
                                 size="sm"
                               >
@@ -271,7 +272,7 @@ export default function CatalogPage() {
                                 View
                               </Button>
                             </Link>
-                            <Button 
+                            <Button
                               className="flex-1 flex items-center gap-1 text-xs"
                               onClick={() => handleAddToCart(product)}
                               disabled={product.stock === 0}
